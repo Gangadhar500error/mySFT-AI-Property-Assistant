@@ -57,7 +57,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t border-gray-100 bg-white p-4">
+    <div className="border-t border-gray-100 bg-white/95 p-4 backdrop-blur-sm">
       {isRecording && <VoiceWaveform />}
 
       {error && (
@@ -75,7 +75,7 @@ export function ChatInput({
             placeholder={placeholder}
             disabled={disabled || isRecording}
             maxLength={mode === "phone" ? 10 : undefined}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gray-300 focus:bg-white disabled:opacity-50"
+            className="w-full rounded-2xl border border-gray-200/80 bg-gray-50/80 px-4 py-3 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-50 disabled:opacity-50"
           />
           {!hideVoice && (
           <button
@@ -101,7 +101,7 @@ export function ChatInput({
         <button
           type="submit"
           disabled={!input.trim() || disabled || isRecording}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white transition-all hover:bg-gray-800 active:scale-95 disabled:opacity-40"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm transition-all hover:bg-gray-800 active:scale-95 disabled:opacity-40"
           aria-label="Send message"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

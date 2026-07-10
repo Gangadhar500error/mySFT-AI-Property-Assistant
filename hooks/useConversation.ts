@@ -65,7 +65,8 @@ export function useConversation() {
   const addMessagesWithDelay = useCallback(async (newMessages: Message[]) => {
     if (newMessages.length === 0) return;
     setIsTyping(true);
-    await new Promise((r) => setTimeout(r, 1200));
+    const delay = 800 + Math.random() * 700;
+    await new Promise((r) => setTimeout(r, delay));
     setIsTyping(false);
     setMessages((prev) => [...prev, ...newMessages]);
   }, []);

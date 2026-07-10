@@ -1,18 +1,34 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { AIAvatar } from "@/components/chat/AIAvatar";
+
 interface FloatingAIButtonProps {
   onClick: () => void;
 }
 
 export function FloatingAIButton({ onClick }: FloatingAIButtonProps) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      className="fixed right-6 bottom-6 z-50 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-gray-900 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-800 hover:shadow-xl active:scale-95 sm:right-8 sm:bottom-8 sm:h-[72px] sm:w-[72px]"
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-full border border-gray-200/80 bg-white py-2 pl-2 pr-5 shadow-lg transition-shadow hover:shadow-xl sm:right-8 sm:bottom-8"
       aria-label="Ask AI"
     >
-      <span className="text-sm font-bold">AI</span>
-      <span className="text-[10px] font-medium opacity-80">Ask AI</span>
-    </button>
+      <AIAvatar size="sm" showOnline />
+      <div className="flex flex-col items-start">
+        <span className="flex items-center gap-1 text-sm font-semibold text-gray-900">
+          <span aria-hidden>✨</span> AI
+        </span>
+        <span className="flex items-center gap-1.5 text-[11px] text-emerald-600">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          </span>
+          Online
+        </span>
+      </div>
+    </motion.button>
   );
 }

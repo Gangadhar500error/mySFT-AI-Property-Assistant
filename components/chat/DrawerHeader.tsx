@@ -1,5 +1,7 @@
 "use client";
 
+import { AIAvatar } from "@/components/chat/AIAvatar";
+
 interface DrawerHeaderProps {
   onVoiceCall: () => void;
   onMinimize: () => void;
@@ -8,17 +10,22 @@ interface DrawerHeaderProps {
 
 export function DrawerHeader({ onVoiceCall, onMinimize, onClose }: DrawerHeaderProps) {
   return (
-    <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+    <div className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
       <div className="flex items-center gap-3">
-        <div className="relative">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-sm font-bold text-white">
-            AI
-          </div>
-          <span className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
-        </div>
+        <AIAvatar size="lg" showOnline />
         <div>
           <h2 className="text-sm font-semibold text-gray-900">AI Property Assistant</h2>
-          <p className="text-xs text-gray-500">Online • Ready to Help</p>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 text-xs text-emerald-600">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
+              Online
+            </span>
+            <span className="text-gray-300">·</span>
+            <p className="text-xs text-gray-500">Usually replies instantly</p>
+          </div>
         </div>
       </div>
 

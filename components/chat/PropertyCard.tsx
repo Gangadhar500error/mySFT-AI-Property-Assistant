@@ -1,18 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 import type { PropertyRecommendation } from "@/types";
 import { Button } from "@/components/ui/Button";
 
 interface PropertyCardProps {
   property: PropertyRecommendation;
+  index?: number;
   onBookSiteVisit?: (project: { projectId: string; projectName: string }) => void;
 }
 
-export function PropertyCard({ property, onBookSiteVisit }: PropertyCardProps) {
+export function PropertyCard({ property, index = 0, onBookSiteVisit }: PropertyCardProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative h-36 w-full overflow-hidden bg-gray-100">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.35,
+        delay: 0.15 * index,
+        ease: "easeOut" as const,
+      }}
+      className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-soft transition-shadow hover:shadow-md"
+    >
+      <div className="relative h-44 w-full overflow-hidden bg-gray-100 sm:h-48">
         <Image
           src={property.imageUrl}
           alt={property.name}
@@ -20,7 +31,7 @@ export function PropertyCard({ property, onBookSiteVisit }: PropertyCardProps) {
           className="object-cover"
           sizes="400px"
         />
-        <div className="absolute top-3 right-3 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+        <div className="absolute top-3 right-3 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
           {property.matchScore}% Match
         </div>
       </div>
@@ -42,7 +53,7 @@ export function PropertyCard({ property, onBookSiteVisit }: PropertyCardProps) {
           {property.reasons.map((reason) => (
             <span
               key={reason}
-              className="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-600"
+              className="inline-flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1 text-xs text-gray-600"
             >
               <span className="text-emerald-600">✔</span> {reason}
             </span>
@@ -71,6 +82,6 @@ export function PropertyCard({ property, onBookSiteVisit }: PropertyCardProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

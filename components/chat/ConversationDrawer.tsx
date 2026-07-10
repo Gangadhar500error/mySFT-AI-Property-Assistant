@@ -14,8 +14,10 @@ import { SiteVisitSummaryCard } from "@/components/site-visit/SiteVisitSummaryCa
 import { SiteVisitConfirming } from "@/components/site-visit/SiteVisitConfirming";
 import { SiteVisitSuccessScreen } from "@/components/site-visit/SiteVisitSuccessScreen";
 import { OptionalActionBar } from "@/components/site-visit/OptionalActionBar";
+import { AIAvatar } from "@/components/chat/AIAvatar";
 import { useConversation } from "@/hooks/useConversation";
 import { useVoice } from "@/hooks/useVoice";
+import { getTypingMessage } from "@/lib/chat-ui";
 
 interface ConversationDrawerProps {
   isOpen: boolean;
@@ -64,6 +66,7 @@ export function ConversationDrawer({
   } = useConversation();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const intentHandled = useRef(false);
 
   const { isRecording, startRecording, stopRecording } = useVoice((text) => {
@@ -81,7 +84,12 @@ export function ConversationDrawer({
   }, [isOpen, intent, initialized, triggerSiteVisit]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const scrollTarget = messagesEndRef.current;
+    if (scrollTarget) {
+      scrollTarget.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, [messages, isTyping, state.step, siteVisit?.step]);
 
   const isSiteVisitFlow = activeFlow === "site-visit" && siteVisit?.active;
@@ -130,15 +138,17 @@ export function ConversationDrawer({
     return (
       <button
         onClick={onRestore}
-        className="fixed right-6 bottom-24 z-50 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-lg transition-all hover:shadow-xl sm:right-8"
+        className="fixed right-6 bottom-24 z-50 flex items-center gap-2.5 rounded-full border border-gray-200/80 bg-white py-2 pl-2 pr-4 text-sm font-medium text-gray-700 shadow-lg transition-all hover:shadow-xl sm:right-8"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-[10px] font-bold text-white">
-          AI
-        </span>
+        <AIAvatar size="sm" showOnline />
         Continue Conversation
       </button>
     );
   }
+
+  const typingMessage = isSiteVisitFlow
+    ? "Preparing your site visit details..."
+    : getTypingMessage(state.step);
 
   return (
     <AnimatePresence>
@@ -167,7 +177,15 @@ export function ConversationDrawer({
             />
 
             {showDiscoverySuccess ? (
-              <SuccessScreen onWhatsAppYes={onClose} onWhatsAppNo={onClose} />
+              <SuccessScreen
+                onWhatsAppYes={onClose}
+                onWhatsAppNo={onClose}
+                onBookSiteVisit={() => {
+                  resetConversation();
+                  triggerSiteVisit();
+                }}
+                onClose={onClose}
+              />
             ) : showSiteVisitSuccess && siteVisit ? (
               <SiteVisitSuccessScreen
                 siteVisit={siteVisit}
@@ -181,12 +199,16 @@ export function ConversationDrawer({
               <SiteVisitConfirming onComplete={completeConfirmation} />
             ) : (
               <>
-                <div className="flex-1 overflow-y-auto py-4">
+                <div
+                  ref={messagesContainerRef}
+                  className="flex-1 overflow-y-auto scroll-smooth py-4"
+                >
                   {initialized &&
                     messages.map((message) => (
                       <MessageBubble
                         key={message.id}
                         message={message}
+                        userName={state.name ?? siteVisit?.name}
                         onSuggestionSelect={clickSuggestion}
                         onBookSiteVisit={(project) =>
                           triggerSiteVisit(project)
@@ -195,7 +217,7 @@ export function ConversationDrawer({
                       />
                     ))}
 
-                  {isTyping && <TypingIndicator />}
+                  {isTyping && <TypingIndicator message={typingMessage} />}
 
                   {showDatePicker && (
                     <div className="px-4 py-2 animate-fade-in">
