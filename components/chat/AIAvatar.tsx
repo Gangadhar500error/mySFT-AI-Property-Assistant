@@ -6,6 +6,7 @@ import { AI_AVATAR_URL } from "@/lib/chat-ui";
 interface AIAvatarProps {
   size?: "sm" | "md" | "lg";
   showOnline?: boolean;
+  bare?: boolean;
   className?: string;
 }
 
@@ -15,11 +16,11 @@ const SIZES = {
   lg: "h-10 w-10",
 } as const;
 
-export function AIAvatar({ size = "md", showOnline = false, className = "" }: AIAvatarProps) {
+export function AIAvatar({ size = "md", showOnline = false, bare = false, className = "" }: AIAvatarProps) {
   return (
     <div className={`relative shrink-0 ${className}`}>
       <div
-        className={`${SIZES[size]} overflow-hidden rounded-full ring-2 ring-white shadow-sm`}
+        className={`${SIZES[size]} overflow-hidden rounded-full ${bare ? "" : "ring-2 ring-white shadow-sm"}`}
       >
         <Image
           src={AI_AVATAR_URL}

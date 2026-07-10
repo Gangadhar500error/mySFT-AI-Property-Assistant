@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIAvatar } from "@/components/chat/AIAvatar";
 
@@ -10,41 +9,23 @@ interface FloatingAIButtonProps {
 }
 
 export function FloatingAIButton({ onClick, visible = true }: FloatingAIButtonProps) {
-  const [showTooltip, setShowTooltip] = useState(false);
-
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <motion.button
+          onClick={onClick}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.2 }}
-          className="fixed right-6 bottom-6 z-40"
+          className="fixed right-6 bottom-6 z-40 flex items-center gap-2.5 rounded-full bg-white py-1 pl-4 pr-1 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
+          aria-label="Open AI Property Assistant"
         >
-          {showTooltip && (
-            <motion.div
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute right-0 bottom-full mb-3 whitespace-nowrap rounded-xl bg-gray-900 px-3.5 py-2 text-[13px] font-medium text-white shadow-lg"
-            >
-              Chat with Sarah
-              <span className="absolute right-5 -bottom-1.5 h-2.5 w-2.5 rotate-45 bg-gray-900" />
-            </motion.div>
-          )}
-
-          <motion.button
-            onClick={onClick}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_4px_24px_rgba(0,0,0,0.15)] ring-2 ring-white"
-            aria-label="Open AI Property Assistant"
-          >
-            <AIAvatar size="sm" showOnline className="scale-110" />
-          </motion.button>
-        </motion.div>
+          <span className="text-[13px] font-semibold text-gray-900">AI Property Assistant</span>
+          <AIAvatar size="sm" showOnline bare />
+        </motion.button>
       )}
     </AnimatePresence>
   );

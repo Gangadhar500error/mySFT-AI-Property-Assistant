@@ -1,23 +1,19 @@
 "use client";
 
+import { useEffect } from "react";
 import { useDrawer } from "@/hooks/useDrawer";
-import { Header } from "@/components/layout/Header";
-import { HeroSection } from "@/components/hero/HeroSection";
 import { FloatingAIButton } from "@/components/chat/FloatingAIButton";
 import { AIAssistantModal } from "@/components/assistant/AIAssistantModal";
 
 export function HomePage() {
   const { isOpen, isMinimized, intent, open, close, minimize, restore } = useDrawer();
 
+  useEffect(() => {
+    open("conversation");
+  }, [open]);
+
   return (
-    <>
-      <Header onTalkToSales={() => open("conversation")} />
-      <main>
-        <HeroSection
-          onStartConversation={() => open("conversation")}
-          onBookSiteVisit={() => open("site-visit")}
-        />
-      </main>
+    <div className="min-h-screen bg-gray-800">
       <FloatingAIButton onClick={() => open("conversation")} visible={!isOpen && !isMinimized} />
       <AIAssistantModal
         isOpen={isOpen}
@@ -27,6 +23,6 @@ export function HomePage() {
         onMinimize={minimize}
         onRestore={restore}
       />
-    </>
+    </div>
   );
 }
