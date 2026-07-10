@@ -11,7 +11,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onStartConversation, onBookSiteVisit }: HeroSectionProps) {
   return (
-    <section className="flex min-h-screen items-center pt-16">
+    <section className="flex min-h-screen items-center pt-16 ">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
         {/* Left */}
         <div className="flex flex-col gap-8 animate-fade-in">

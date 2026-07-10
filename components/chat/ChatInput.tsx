@@ -24,7 +24,7 @@ export function ChatInput({
   isRecording,
   disabled,
   mode = "text",
-  placeholder = "Type your message...",
+  placeholder = "Ask about properties...",
   error,
   value: controlledValue,
   onChange: controlledOnChange,
@@ -36,9 +36,7 @@ export function ChatInput({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!disabled && !isRecording) {
-      inputRef.current?.focus();
-    }
+    if (!disabled && !isRecording) inputRef.current?.focus();
   }, [disabled, isRecording, mode]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,24 +46,13 @@ export function ChatInput({
     if (controlledValue === undefined) setInternalInput("");
   };
 
-  const toggleVoice = () => {
-    if (isRecording) {
-      onVoiceStop();
-    } else {
-      onVoiceStart();
-    }
-  };
-
   return (
-    <div className="border-t border-gray-100 bg-white/95 p-4 backdrop-blur-sm">
+    <div className="shrink-0 border-t border-gray-100 bg-white px-5 py-3">
       {isRecording && <VoiceWaveform />}
-
-      {error && (
-        <p className="mb-2 text-xs text-red-600 animate-fade-in">{error}</p>
-      )}
+      {error && <p className="mb-2 text-[12px] text-red-600">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <div className="relative flex flex-1 items-center">
+        <div className="relative flex-1">
           <input
             ref={inputRef}
             type={mode === "phone" ? "tel" : "text"}
@@ -75,38 +62,33 @@ export function ChatInput({
             placeholder={placeholder}
             disabled={disabled || isRecording}
             maxLength={mode === "phone" ? 10 : undefined}
-            className="w-full rounded-2xl border border-gray-200/80 bg-gray-50/80 px-4 py-3 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-50 disabled:opacity-50"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-[15px] text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-300 focus:bg-white disabled:opacity-50"
           />
           {!hideVoice && (
-          <button
-            type="button"
-            onClick={toggleVoice}
-            disabled={disabled}
-            className={`absolute right-2 flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
-              isRecording
-                ? "bg-red-100 text-red-600"
-                : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            }`}
-            aria-label={isRecording ? "Stop recording" : "Start recording"}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" x2="12" y1="19" y2="22" />
-            </svg>
-          </button>
+            <button
+              type="button"
+              onClick={isRecording ? onVoiceStop : onVoiceStart}
+              disabled={disabled}
+              className={`absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg ${
+                isRecording ? "text-red-500" : "text-gray-400 hover:text-gray-600"
+              }`}
+              aria-label="Voice"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              </svg>
+            </button>
           )}
         </div>
-
         <button
           type="submit"
           disabled={!input.trim() || disabled || isRecording}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm transition-all hover:bg-gray-800 active:scale-95 disabled:opacity-40"
-          aria-label="Send message"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40"
+          aria-label="Send"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m22 2-7 20-4-9-9-4Z" />
-            <path d="M22 2 11 13" />
           </svg>
         </button>
       </form>

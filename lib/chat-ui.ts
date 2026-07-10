@@ -28,6 +28,39 @@ export function parseAssistantMessage(content: string, hasSuggestions: boolean) 
   return { acknowledgment: content, question: null as string | null };
 }
 
+export type MessageBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] };
+
+/** Splits message text into neat paragraphs and bullet lists for display. */
+export function parseMessageBlocks(content: string): MessageBlock[] {
+  const blocks: MessageBlock[] = [];
+  const sections = content.split("\n\n").filter((s) => s.trim());
+
+  for (const section of sections) {
+    const lines = section.split("\n").map((l) => l.trim()).filter(Boolean);
+    const bulletLines = lines.filter((l) => /^[•✓✔\-–]/.test(l));
+    const plainLines = lines.filter((l) => !/^[•✓✔\-–]/.test(l));
+
+    if (plainLines.length > 0) {
+      blocks.push({ type: "paragraph", text: plainLines.join("\n") });
+    }
+
+    if (bulletLines.length > 0) {
+      blocks.push({
+        type: "list",
+        items: bulletLines.map((l) => l.replace(/^[•✓✔\-–]\s*/, "")),
+      });
+    }
+  }
+
+  if (blocks.length === 0 && content.trim()) {
+    blocks.push({ type: "paragraph", text: content.trim() });
+  }
+
+  return blocks;
+}
+
 export function getTypingMessage(step?: string): string {
   const messages: Record<string, string> = {
     welcome: "AI is analysing your requirements...",

@@ -4,7 +4,7 @@ import { useDrawer } from "@/hooks/useDrawer";
 import { Header } from "@/components/layout/Header";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { FloatingAIButton } from "@/components/chat/FloatingAIButton";
-import { ConversationDrawer } from "@/components/chat/ConversationDrawer";
+import { AIAssistantModal } from "@/components/assistant/AIAssistantModal";
 
 export function HomePage() {
   const { isOpen, isMinimized, intent, open, close, minimize, restore } = useDrawer();
@@ -19,7 +19,7 @@ export function HomePage() {
         />
       </main>
       <FloatingAIButton onClick={() => open("conversation")} />
-      <ConversationDrawer
+      <AIAssistantModal
         isOpen={isOpen}
         isMinimized={isMinimized}
         intent={intent}

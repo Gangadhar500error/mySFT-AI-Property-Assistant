@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { PropertyRecommendation } from "@/types";
-import { Button } from "@/components/ui/Button";
 
 interface PropertyCardProps {
   property: PropertyRecommendation;
@@ -12,74 +11,66 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, index = 0, onBookSiteVisit }: PropertyCardProps) {
+  const highlights = property.reasons.slice(0, 3);
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        duration: 0.35,
-        delay: 0.15 * index,
-        ease: "easeOut" as const,
-      }}
-      className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-soft transition-shadow hover:shadow-md"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 * index }}
+      className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-soft"
+      style={{ maxHeight: 280 }}
     >
-      <div className="relative h-44 w-full overflow-hidden bg-gray-100 sm:h-48">
-        <Image
-          src={property.imageUrl}
-          alt={property.name}
-          fill
-          className="object-cover"
-          sizes="400px"
-        />
-        <div className="absolute top-3 right-3 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
-          {property.matchScore}% Match
-        </div>
-      </div>
-
-      <div className="space-y-3 p-4">
-        <div>
-          <h4 className="font-semibold text-gray-900">{property.name}</h4>
-          <p className="text-sm text-gray-500">{property.location}</p>
+      <div className="flex h-[280px] flex-col">
+        <div className="relative h-[110px] shrink-0 overflow-hidden bg-gray-100">
+          <Image
+            src={property.imageUrl}
+            alt={property.name}
+            fill
+            className="object-cover"
+            sizes="400px"
+          />
+          <span className="absolute top-2 right-2 rounded-full bg-white/95 px-2 py-0.5 text-[12px] font-semibold text-emerald-700 shadow-sm">
+            {property.matchScore}% Match
+          </span>
         </div>
 
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">{property.configuration}</span>
-          <span className="font-semibold text-gray-900">{property.price}</span>
-        </div>
+        <div className="flex flex-1 flex-col justify-between p-3">
+          <div>
+            <h4 className="text-[14px] font-semibold text-gray-900">{property.name}</h4>
+            <p className="text-[13px] text-gray-500">{property.location}</p>
+            <p className="mt-1 text-[14px] font-semibold text-gray-900">{property.price}</p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {highlights.map((r) => (
+                <span
+                  key={r}
+                  className="rounded-full bg-gray-50 px-2 py-0.5 text-[12px] text-gray-600"
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
+          </div>
 
-        <p className="text-xs text-gray-500">{property.availability}</p>
-
-        <div className="flex flex-wrap gap-1.5">
-          {property.reasons.map((reason) => (
-            <span
-              key={reason}
-              className="inline-flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1 text-xs text-gray-600"
+          <div className="mt-2 flex gap-1.5">
+            <button className="flex-1 rounded-lg bg-gray-900 py-1.5 text-[12px] font-medium text-white hover:bg-gray-800">
+              View Project
+            </button>
+            <button
+              onClick={() =>
+                onBookSiteVisit?.({
+                  projectId: property.id,
+                  projectName: property.name,
+                })
+              }
+              className="flex-1 rounded-lg border border-gray-200 py-1.5 text-[12px] font-medium text-gray-700 hover:bg-gray-50"
             >
-              <span className="text-emerald-600">✔</span> {reason}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex gap-2 pt-1">
-          <Button variant="primary" size="sm" className="flex-1 text-xs">
-            View Project
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 text-xs"
-            onClick={() =>
-              onBookSiteVisit?.({
-                projectId: property.id,
-                projectName: property.name,
-              })
-            }
-          >
-            Book Site Visit
-          </Button>
-          <Button variant="ghost" size="sm" className="px-2 text-xs">
-            Save
-          </Button>
+              Book Visit
+            </button>
+            <button className="rounded-lg border border-gray-200 px-2 py-1.5 text-[12px] text-gray-500 hover:bg-gray-50">
+              Compare
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

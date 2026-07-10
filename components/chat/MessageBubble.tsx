@@ -1,73 +1,79 @@
 "use client";
 
-import { motion } from "framer-motion";
-import type { Message, SuggestionChip } from "@/types";
-import { parseAssistantMessage } from "@/lib/chat-ui";
+import { motion, AnimatePresence } from "framer-motion";
+import type { ConversationStep, Message, SuggestionChip } from "@/types";
+import { parseAssistantMessage, parseMessageBlocks } from "@/lib/chat-ui";
 import { AIAvatar } from "@/components/chat/AIAvatar";
 import { UserAvatar } from "@/components/chat/UserAvatar";
-import { SuggestionChips } from "@/components/chat/SuggestionChips";
+import { CompactSuggestions } from "@/components/assistant/CompactSuggestions";
 import { PropertyCard } from "@/components/chat/PropertyCard";
 
 interface MessageBubbleProps {
   message: Message;
   userName?: string;
+  currentStep?: ConversationStep;
+  showAvatar?: boolean;
+  isLatestAssistant?: boolean;
+  isAnswered?: boolean;
   onSuggestionSelect?: (suggestion: SuggestionChip) => void;
   onBookSiteVisit?: (project: { projectId: string; projectName: string }) => void;
   disabled?: boolean;
 }
 
-const userVariants = {
-  hidden: { opacity: 0, x: 24, scale: 0.96 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" as const },
-  },
-};
+function FormattedContent({ content }: { content: string }) {
+  const blocks = parseMessageBlocks(content);
 
-const aiBubbleVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, delay: 0.1, ease: "easeOut" as const },
-  },
-};
-
-function AssistantBubble({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <motion.div
-      variants={aiBubbleVariants}
-      initial="hidden"
-      animate="visible"
-      className={`rounded-2xl rounded-tl-md border border-gray-100/80 bg-white px-4 py-3 text-sm leading-relaxed text-gray-800 shadow-soft whitespace-pre-line ${className}`}
-    >
-      {children}
-    </motion.div>
+    <div className="space-y-2">
+      {blocks.map((block, i) =>
+        block.type === "paragraph" ? (
+          <p key={i} className="text-[15px] leading-relaxed text-gray-800">
+            {block.text}
+          </p>
+        ) : (
+          <ul key={i} className="space-y-1 pl-1">
+            {block.items.map((item, j) => (
+              <li key={j} className="flex items-start gap-2 text-[15px] leading-relaxed text-gray-700">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-400" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      )}
+    </div>
   );
 }
 
 export function MessageBubble({
   message,
   userName,
+  showAvatar = true,
+  isLatestAssistant = false,
+  isAnswered = false,
   onSuggestionSelect,
   onBookSiteVisit,
   disabled,
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const hasSuggestions = Boolean(message.suggestions && message.suggestions.length > 0);
-  const { acknowledgment, question } = parseAssistantMessage(message.content, hasSuggestions);
+  const showSuggestions = hasSuggestions && isLatestAssistant && !isAnswered;
+  const showCollapsed = hasSuggestions && isAnswered;
+
+  const { acknowledgment, question } = parseAssistantMessage(
+    message.content,
+    showSuggestions || showCollapsed
+  );
 
   if (isUser) {
     return (
       <motion.div
-        variants={userVariants}
-        initial="hidden"
-        animate="visible"
-        className="flex items-end justify-end gap-2.5 px-4 py-2"
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.25 }}
+        className="flex items-end justify-end gap-2 px-5 py-2"
       >
-        <div className="max-w-[80%] rounded-2xl rounded-tr-md bg-gray-900 px-4 py-3 text-sm leading-relaxed text-white shadow-sm">
+        <div className="max-w-[55%] rounded-2xl bg-gray-900 px-4 py-2.5 text-[15px] leading-relaxed text-white">
           {message.content}
         </div>
         <UserAvatar name={userName} />
@@ -75,48 +81,61 @@ export function MessageBubble({
     );
   }
 
-  return (
-    <div className="space-y-4 px-4 py-2">
-      <div className="flex items-start gap-3">
-        <AIAvatar size="md" />
-        <div className="min-w-0 flex-1 max-w-[calc(100%-3rem)]">
-          {acknowledgment.trim() ? (
-            <AssistantBubble>{acknowledgment}</AssistantBubble>
-          ) : !hasSuggestions ? (
-            <AssistantBubble>{message.content}</AssistantBubble>
-          ) : null}
+  const displayText = acknowledgment.trim() || (!showSuggestions ? message.content : "");
 
-          {!hasSuggestions && question && (
-            <div className="mt-3">
-              <AssistantBubble>{question}</AssistantBubble>
+  return (
+    <div className="px-5 py-2">
+      <div className="flex items-start gap-2.5">
+        {showAvatar ? (
+          <AIAvatar size="md" className="mt-0.5 shrink-0" />
+        ) : (
+          <div className="w-10 shrink-0" />
+        )}
+
+        <div className="min-w-0 max-w-[72%] space-y-2">
+          {displayText && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="rounded-2xl border border-gray-100 bg-white px-4 py-2.5 shadow-soft"
+            >
+              <FormattedContent content={displayText} />
+            </motion.div>
+          )}
+
+          {(showSuggestions || showCollapsed) && (
+            <div className="space-y-2">
+              {question && (
+                <p className="text-[15px] font-medium text-gray-900">{question}</p>
+              )}
+              <AnimatePresence mode="wait">
+                {message.suggestions && onSuggestionSelect && (
+                  <CompactSuggestions
+                    suggestions={message.suggestions}
+                    onSelect={onSuggestionSelect}
+                    disabled={disabled}
+                    isCollapsed={isAnswered}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {message.propertyCards && message.propertyCards.length > 0 && (
+            <div className="space-y-3 pt-1">
+              {message.propertyCards.map((property, index) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  index={index}
+                  onBookSiteVisit={onBookSiteVisit}
+                />
+              ))}
             </div>
           )}
         </div>
       </div>
-
-      {hasSuggestions && onSuggestionSelect && message.suggestions && (
-        <div className="flex justify-center px-2">
-          <SuggestionChips
-            title={question ?? undefined}
-            suggestions={message.suggestions}
-            onSelect={onSuggestionSelect}
-            disabled={disabled}
-          />
-        </div>
-      )}
-
-      {message.propertyCards && message.propertyCards.length > 0 && (
-        <div className="space-y-4 px-2">
-          {message.propertyCards.map((property, index) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              index={index}
-              onBookSiteVisit={onBookSiteVisit}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
