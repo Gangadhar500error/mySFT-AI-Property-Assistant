@@ -12,10 +12,18 @@ export function HomePage() {
     open("conversation");
   }, [open]);
 
+  const handleToggleChat = () => {
+    if (isOpen && !isMinimized) {
+      close();
+    } else {
+      open("conversation");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-800">
       <FloatingAIButton
-        onClick={() => open("conversation")}
+        onClick={handleToggleChat}
         visible={!isMinimized}
         active={isOpen && !isMinimized}
       />
