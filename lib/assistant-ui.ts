@@ -1,4 +1,4 @@
-import type { ConversationState, ConversationStep } from "@/types";
+import type { ConversationState, ConversationStep, SiteVisitStep } from "@/types";
 
 export const THINKING_MESSAGES = [
   "Thinking...",
@@ -30,6 +30,13 @@ export const PROGRESS_STEPS = [
 
 export const COLORFUL_STEPS = PROGRESS_STEPS;
 
+export const SITE_VISIT_PROGRESS_STEPS = [
+  { key: "date", label: "Visit Date", color: "#3b82f6" },
+  { key: "time", label: "Visit Time", color: "#14b8a6" },
+  { key: "details", label: "Your Details", color: "#8b5cf6" },
+  { key: "confirm", label: "Confirm", color: "#10b981" },
+] as const;
+
 const STEP_INDEX: Partial<Record<ConversationStep, number>> = {
   welcome: 0,
   "property-type": 1,
@@ -51,13 +58,50 @@ const STEP_INDEX: Partial<Record<ConversationStep, number>> = {
 };
 
 export function getConversationProgress(step: ConversationStep) {
-  const current = STEP_INDEX[step] ?? 1;
   const total = PROGRESS_STEPS.length;
+
+  if (step === "welcome") {
+    return {
+      current: 1,
+      total,
+      label: "Getting Started",
+      percent: Math.round((1 / total) * 100),
+    };
+  }
+
+  const current = STEP_INDEX[step] ?? 1;
   const index = Math.min(Math.max(current - 1, 0), total - 1);
   return {
     current: Math.min(current, total),
     total,
     label: PROGRESS_STEPS[index]?.label ?? "Getting Started",
+    percent: Math.round((current / total) * 100),
+  };
+}
+
+const SITE_VISIT_STEP_INDEX: Partial<Record<SiteVisitStep, number>> = {
+  welcome: 1,
+  date: 1,
+  time: 2,
+  "custom-time": 2,
+  "call-request": 3,
+  name: 3,
+  mobile: 3,
+  email: 3,
+  "special-request": 3,
+  summary: 4,
+  confirming: 4,
+  success: 4,
+};
+
+export function getSiteVisitProgress(step: SiteVisitStep) {
+  const current = SITE_VISIT_STEP_INDEX[step] ?? 1;
+  const total = SITE_VISIT_PROGRESS_STEPS.length;
+  const index = Math.min(Math.max(current - 1, 0), total - 1);
+  return {
+    current: Math.min(current, total),
+    total,
+    label: SITE_VISIT_PROGRESS_STEPS[index]?.label ?? "Site Visit",
     percent: Math.round((current / total) * 100),
   };
 }

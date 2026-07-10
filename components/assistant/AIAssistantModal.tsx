@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { AssistantHeader } from "@/components/assistant/AssistantHeader";
+import { AssistantProgress } from "@/components/assistant/AssistantProgress";
 import { SiteVisitBookingCard } from "@/components/assistant/SiteVisitBookingCard";
 import { SiteVisitSuccessCard } from "@/components/assistant/SiteVisitSuccessCard";
 import { VoiceModePanel } from "@/components/assistant/VoiceModePanel";
@@ -147,7 +148,7 @@ export function AIAssistantModal({
 
           <motion.div
             {...WIDGET_ANIMATION}
-            className="fixed right-6 bottom-6 z-50 flex w-[420px] max-h-[720px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            className="fixed right-6 bottom-6 top-6 z-50 flex h-[620px] w-[420px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
           >
             <AssistantHeader
               onVoiceCall={() => {
@@ -158,7 +159,13 @@ export function AIAssistantModal({
               onClose={onClose}
             />
 
-            <div className="relative flex min-h-0 flex-1 flex-col">
+            <AssistantProgress
+              flow={isSiteVisitFlow ? "site-visit" : "discovery"}
+              step={state.step}
+              siteVisitStep={siteVisit?.step}
+            />
+
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
               <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
                 {initialized &&
                   !singleFocusMode &&

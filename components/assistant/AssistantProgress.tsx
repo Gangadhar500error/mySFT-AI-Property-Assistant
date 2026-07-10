@@ -1,27 +1,41 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ConversationStep } from "@/types";
-import { COLORFUL_STEPS, getConversationProgress } from "@/lib/assistant-ui";
+import type { ConversationStep, SiteVisitStep } from "@/types";
+import {
+  COLORFUL_STEPS,
+  SITE_VISIT_PROGRESS_STEPS,
+  getConversationProgress,
+  getSiteVisitProgress,
+} from "@/lib/assistant-ui";
 
 interface AssistantProgressProps {
+  flow: "discovery" | "site-visit";
   step: ConversationStep;
+  siteVisitStep?: SiteVisitStep;
 }
 
-export function AssistantProgress({ step }: AssistantProgressProps) {
-  const { current, total, label } = getConversationProgress(step);
-  const activeColor = COLORFUL_STEPS[current - 1]?.color ?? "#6366f1";
+export function AssistantProgress({ flow, step, siteVisitStep }: AssistantProgressProps) {
+  const isSiteVisit = flow === "site-visit" && siteVisitStep;
 
-  if (step === "welcome" || step === "success" || step === "summary") return null;
+  if (isSiteVisit && siteVisitStep === "success") return null;
+  if (!isSiteVisit && (step === "success" || step === "summary")) return null;
+
+  const { current, total, label } = isSiteVisit
+    ? getSiteVisitProgress(siteVisitStep)
+    : getConversationProgress(step);
+
+  const steps = isSiteVisit ? SITE_VISIT_PROGRESS_STEPS : COLORFUL_STEPS;
+  const activeColor = steps[current - 1]?.color ?? "#6366f1";
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex shrink-0 items-center gap-3 border-b border-gray-100 bg-white px-5 py-2"
+      className="flex shrink-0 items-center gap-3 border-b border-gray-100 bg-white px-4 py-2"
     >
       <div className="flex items-center gap-1">
-        {COLORFUL_STEPS.map((s, i) => {
+        {steps.map((s, i) => {
           const n = i + 1;
           const done = n < current;
           const active = n === current;
