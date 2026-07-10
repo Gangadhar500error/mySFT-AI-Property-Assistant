@@ -14,7 +14,11 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-800">
-      <FloatingAIButton onClick={() => open("conversation")} visible={!isOpen && !isMinimized} />
+      <FloatingAIButton
+        onClick={() => open("conversation")}
+        visible={!isMinimized}
+        active={isOpen && !isMinimized}
+      />
       <AIAssistantModal
         isOpen={isOpen}
         isMinimized={isMinimized}

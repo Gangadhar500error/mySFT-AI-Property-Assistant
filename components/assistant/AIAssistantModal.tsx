@@ -148,7 +148,7 @@ export function AIAssistantModal({
 
           <motion.div
             {...WIDGET_ANIMATION}
-            className="fixed right-6 bottom-6 top-6 z-50 flex h-[620px] w-[420px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            className="fixed right-6 bottom-[80px] z-50 flex h-[620px] w-[420px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
           >
             <AssistantHeader
               onVoiceCall={() => {
