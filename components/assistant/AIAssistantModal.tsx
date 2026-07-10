@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { AssistantHeader } from "@/components/assistant/AssistantHeader";
 import { AssistantWelcome } from "@/components/assistant/AssistantWelcome";
+import { AssistantProgress } from "@/components/assistant/AssistantProgress";
 import { SiteVisitBookingCard } from "@/components/assistant/SiteVisitBookingCard";
 import { SiteVisitSuccessCard } from "@/components/assistant/SiteVisitSuccessCard";
 import { VoiceModePanel } from "@/components/assistant/VoiceModePanel";
@@ -152,7 +153,7 @@ export function AIAssistantModal({
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.25 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex h-[85vh] w-full max-w-[680px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
+              className="relative flex h-[85vh] w-full max-w-[880px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
             >
               <AssistantHeader
                 onVoiceCall={() => {
@@ -174,7 +175,11 @@ export function AIAssistantModal({
                 />
               ) : (
                 <div className="relative flex min-h-0 flex-1 flex-col">
-                  <div className="flex-1 overflow-y-auto scroll-smooth">
+                  {!isSiteVisitFlow && !singleFocusMode && (
+                    <AssistantProgress step={state.step} />
+                  )}
+
+                  <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth bg-gray-50/40">
                     {!singleFocusMode &&
                       initialized &&
                       messages.map((message, index) => {

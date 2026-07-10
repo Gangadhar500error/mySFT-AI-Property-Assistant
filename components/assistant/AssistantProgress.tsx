@@ -2,37 +2,53 @@
 
 import { motion } from "framer-motion";
 import type { ConversationStep } from "@/types";
-import { getConversationProgress } from "@/lib/assistant-ui";
+import { COLORFUL_STEPS, getConversationProgress } from "@/lib/assistant-ui";
 
 interface AssistantProgressProps {
   step: ConversationStep;
 }
 
 export function AssistantProgress({ step }: AssistantProgressProps) {
-  const { current, total, label, percent } = getConversationProgress(step);
+  const { current, total, label } = getConversationProgress(step);
+  const activeColor = COLORFUL_STEPS[current - 1]?.color ?? "#6366f1";
 
   if (step === "welcome" || step === "success" || step === "summary") return null;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -4 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="border-b border-gray-100/80 bg-gray-50/40 px-8 py-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex shrink-0 items-center gap-3 border-b border-gray-100 bg-white px-5 py-2"
     >
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-semibold text-gray-700">
-          Step {current} of {total}
+      <div className="flex items-center gap-1">
+        {COLORFUL_STEPS.map((s, i) => {
+          const n = i + 1;
+          const done = n < current;
+          const active = n === current;
+          return (
+            <div
+              key={s.key}
+              title={s.label}
+              className="h-1.5 w-1.5 rounded-full transition-colors"
+              style={{
+                backgroundColor: done || active ? s.color : "#e5e7eb",
+                transform: active ? "scale(1.4)" : undefined,
+                boxShadow: active ? `0 0 0 2px ${s.color}40` : undefined,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <p className="min-w-0 flex-1 truncate text-[12px] text-gray-500">
+        <span className="font-medium text-gray-600">
+          {current}/{total}
         </span>
-        <span className="text-gray-500">{label}</span>
-      </div>
-      <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-gray-200/80">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${percent}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="h-full rounded-full bg-gray-900"
-        />
-      </div>
+        <span className="mx-1.5 text-gray-300">·</span>
+        <span style={{ color: activeColor }} className="font-medium">
+          {label}
+        </span>
+      </p>
     </motion.div>
   );
 }

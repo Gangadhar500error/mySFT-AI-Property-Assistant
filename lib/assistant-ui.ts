@@ -19,14 +19,16 @@ export const WELCOME_FEATURES = [
 ] as const;
 
 export const PROGRESS_STEPS = [
-  { key: "property-type", label: "Property Type" },
-  { key: "city", label: "Location" },
-  { key: "budget", label: "Budget" },
-  { key: "bedrooms", label: "Configuration" },
-  { key: "purpose", label: "Preferences" },
-  { key: "site-visit", label: "Site Visit" },
-  { key: "name", label: "Your Details" },
+  { key: "property-type", label: "Property Type", icon: "🏠", color: "#3b82f6" },
+  { key: "city", label: "Location", icon: "📍", color: "#14b8a6" },
+  { key: "budget", label: "Budget", icon: "💰", color: "#f59e0b" },
+  { key: "bedrooms", label: "Configuration", icon: "🛏️", color: "#8b5cf6" },
+  { key: "purpose", label: "Preferences", icon: "✨", color: "#ec4899" },
+  { key: "site-visit", label: "Site Visit", icon: "📅", color: "#f97316" },
+  { key: "name", label: "Your Details", icon: "👤", color: "#10b981" },
 ] as const;
+
+export const COLORFUL_STEPS = PROGRESS_STEPS;
 
 const STEP_INDEX: Partial<Record<ConversationStep, number>> = {
   welcome: 0,
