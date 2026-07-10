@@ -24,7 +24,7 @@ export function VoiceModePanel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-3xl bg-white/98 px-4"
     >
       <AIAvatar size="lg" className="mb-8" />
 
@@ -78,7 +78,7 @@ export function VoiceModePanel({
         onClick={onEnd}
         className="mt-10 rounded-full border border-gray-200 px-6 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
       >
-        End Call
+        End Voice Session
       </button>
     </motion.div>
   );

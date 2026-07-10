@@ -18,7 +18,7 @@ export function HomePage() {
           onBookSiteVisit={() => open("site-visit")}
         />
       </main>
-      <FloatingAIButton onClick={() => open("conversation")} />
+      <FloatingAIButton onClick={() => open("conversation")} visible={!isOpen && !isMinimized} />
       <AIAssistantModal
         isOpen={isOpen}
         isMinimized={isMinimized}

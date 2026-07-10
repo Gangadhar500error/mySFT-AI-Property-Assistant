@@ -49,7 +49,7 @@ export function SiteVisitBookingCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="mx-auto max-w-[72%] rounded-2xl border border-gray-100 bg-white p-5 shadow-soft"
+      className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
     >
       <h3 className="mb-1 text-[15px] font-semibold text-gray-900">Book Site Visit</h3>
       {siteVisit.projectName && (

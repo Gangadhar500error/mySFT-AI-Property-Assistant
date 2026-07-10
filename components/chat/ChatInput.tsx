@@ -24,7 +24,7 @@ export function ChatInput({
   isRecording,
   disabled,
   mode = "text",
-  placeholder = "Ask about properties...",
+  placeholder = "Ask anything about properties...",
   error,
   value: controlledValue,
   onChange: controlledOnChange,
@@ -34,6 +34,7 @@ export function ChatInput({
   const input = controlledValue !== undefined ? controlledValue : internalInput;
   const setInput = controlledOnChange ?? setInternalInput;
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasText = Boolean(input.trim());
 
   useEffect(() => {
     if (!disabled && !isRecording) inputRef.current?.focus();
@@ -47,7 +48,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="shrink-0 border-t border-gray-100 bg-white px-5 py-3">
+    <div className="shrink-0 border-t border-gray-100 bg-white px-4 py-3">
       {isRecording && <VoiceWaveform />}
       {error && <p className="mb-2 text-[12px] text-red-600">{error}</p>}
 
@@ -62,35 +63,43 @@ export function ChatInput({
             placeholder={placeholder}
             disabled={disabled || isRecording}
             maxLength={mode === "phone" ? 10 : undefined}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-[15px] text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-300 focus:bg-white disabled:opacity-50"
+            className="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-4 pr-20 text-[14px] text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-blue-300 focus:bg-white disabled:opacity-50"
           />
-          {!hideVoice && (
+          <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-0.5">
+            {!hideVoice && (
+              <button
+                type="button"
+                onClick={isRecording ? onVoiceStop : onVoiceStart}
+                disabled={disabled}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  isRecording
+                    ? "bg-red-50 text-red-500"
+                    : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                }`}
+                aria-label="Voice"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                </svg>
+              </button>
+            )}
             <button
-              type="button"
-              onClick={isRecording ? onVoiceStop : onVoiceStart}
-              disabled={disabled}
-              className={`absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg ${
-                isRecording ? "text-red-500" : "text-gray-400 hover:text-gray-600"
-              }`}
-              aria-label="Voice"
+              type="submit"
+              disabled={!hasText || disabled || isRecording}
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
+                hasText
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-200 text-gray-400"
+              } disabled:opacity-40`}
+              aria-label="Send"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="m22 2-7 20-4-9-9-4Z" />
               </svg>
             </button>
-          )}
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={!input.trim() || disabled || isRecording}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40"
-          aria-label="Send"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m22 2-7 20-4-9-9-4Z" />
-          </svg>
-        </button>
       </form>
     </div>
   );

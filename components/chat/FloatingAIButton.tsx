@@ -1,42 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { AIAvatar } from "@/components/chat/AIAvatar";
 
 interface FloatingAIButtonProps {
   onClick: () => void;
+  visible?: boolean;
 }
 
-export function FloatingAIButton({ onClick }: FloatingAIButtonProps) {
+export function FloatingAIButton({ onClick, visible = true }: FloatingAIButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className="fixed right-6 bottom-6 z-40 sm:right-8 sm:bottom-8">
-      {showTooltip && (
+    <AnimatePresence>
+      {visible && (
         <motion.div
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute right-0 bottom-full mb-3 whitespace-nowrap rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2 }}
+          className="fixed right-6 bottom-6 z-40"
         >
-          Ask AI Property Assistant
-          <span className="absolute right-5 -bottom-1.5 h-3 w-3 rotate-45 bg-gray-900" />
+          {showTooltip && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute right-0 bottom-full mb-3 whitespace-nowrap rounded-xl bg-gray-900 px-3.5 py-2 text-[13px] font-medium text-white shadow-lg"
+            >
+              Chat with Sarah
+              <span className="absolute right-5 -bottom-1.5 h-2.5 w-2.5 rotate-45 bg-gray-900" />
+            </motion.div>
+          )}
+
+          <motion.button
+            onClick={onClick}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_4px_24px_rgba(0,0,0,0.15)] ring-2 ring-white"
+            aria-label="Open AI Property Assistant"
+          >
+            <AIAvatar size="sm" showOnline className="scale-110" />
+          </motion.button>
         </motion.div>
       )}
-
-      <motion.button
-        onClick={onClick}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.94 }}
-        animate={{ boxShadow: ["0 4px 20px rgba(0,0,0,0.12)", "0 8px 32px rgba(0,0,0,0.18)", "0 4px 20px rgba(0,0,0,0.12)"] }}
-        transition={{ boxShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" } }}
-        className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-900 text-white shadow-lg"
-        aria-label="Ask AI Property Assistant"
-      >
-        <span className="absolute inset-0 animate-ping rounded-full bg-gray-900/20" style={{ animationDuration: "3s" }} />
-        <span className="relative text-2xl" aria-hidden>✨</span>
-      </motion.button>
-    </div>
+    </AnimatePresence>
   );
 }
