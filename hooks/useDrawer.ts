@@ -6,27 +6,22 @@ export type DrawerIntent = "conversation" | "site-visit";
 
 export function useDrawer() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [intent, setIntent] = useState<DrawerIntent>("conversation");
 
   const open = useCallback((drawerIntent: DrawerIntent = "conversation") => {
     setIntent(drawerIntent);
     setIsOpen(true);
-    setIsMinimized(false);
+    setIsMaximized(false);
   }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
-    setIsMinimized(false);
   }, []);
 
-  const minimize = useCallback(() => {
-    setIsMinimized(true);
+  const toggleMaximize = useCallback(() => {
+    setIsMaximized((prev) => !prev);
   }, []);
 
-  const restore = useCallback(() => {
-    setIsMinimized(false);
-  }, []);
-
-  return { isOpen, isMinimized, intent, open, close, minimize, restore };
+  return { isOpen, isMaximized, intent, open, close, toggleMaximize };
 }

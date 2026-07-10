@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AssistantHeader } from "@/components/assistant/AssistantHeader";
 import { AssistantProgress } from "@/components/assistant/AssistantProgress";
 import { SiteVisitBookingCard } from "@/components/assistant/SiteVisitBookingCard";
@@ -12,34 +12,100 @@ import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { LeadSummaryCard } from "@/components/chat/LeadSummaryCard";
 import { SiteVisitConfirming } from "@/components/site-visit/SiteVisitConfirming";
-import { AIAvatar } from "@/components/chat/AIAvatar";
 import { useConversation } from "@/hooks/useConversation";
 import { useVoice } from "@/hooks/useVoice";
 import { getTypingMessage } from "@/lib/chat-ui";
 
 interface AIAssistantModalProps {
   isOpen: boolean;
-  isMinimized: boolean;
+  isMaximized: boolean;
   intent?: "conversation" | "site-visit";
   onClose: () => void;
-  onMinimize: () => void;
-  onRestore: () => void;
+  onToggleMaximize: () => void;
 }
 
-const WIDGET_ANIMATION = {
-  initial: { opacity: 0, scale: 0.9, y: 20 },
-  animate: { opacity: 1, scale: 1, y: 0 },
-  exit: { opacity: 0, scale: 0.9, y: 20 },
-  transition: { duration: 0.22, ease: "easeOut" as const },
+const OPEN_TRANSITION = {
+  duration: 0.24,
+  ease: [0.32, 0.72, 0, 1] as const,
 };
+
+const SIZE_TRANSITION = {
+  duration: 0.32,
+  ease: [0.32, 0.72, 0, 1] as const,
+};
+
+const WIDGET_SIZE = { width: 420, height: 620, right: 24, bottom: 80, radius: 24 };
+
+const EXPANDED_SIZE = {
+  maxWidth: 960,
+  sideGap: 24,
+  topGap: 28,
+  bottomGap: 96,
+  radius: 24,
+};
+
+type ModalLayout = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  borderRadius: number;
+};
+
+function getWidgetLayout(viewportWidth: number, viewportHeight: number): ModalLayout {
+  return {
+    top: viewportHeight - WIDGET_SIZE.bottom - WIDGET_SIZE.height,
+    left: viewportWidth - WIDGET_SIZE.right - WIDGET_SIZE.width,
+    width: WIDGET_SIZE.width,
+    height: WIDGET_SIZE.height,
+    borderRadius: WIDGET_SIZE.radius,
+  };
+}
+
+function getExpandedLayout(viewportWidth: number, viewportHeight: number): ModalLayout {
+  const sideGap = viewportWidth < 640 ? 16 : EXPANDED_SIZE.sideGap;
+  const topGap = viewportWidth < 640 ? 16 : EXPANDED_SIZE.topGap;
+  const width = Math.min(viewportWidth - sideGap * 2, EXPANDED_SIZE.maxWidth);
+  const height = viewportHeight - topGap - EXPANDED_SIZE.bottomGap;
+
+  return {
+    top: topGap,
+    left: (viewportWidth - width) / 2,
+    width,
+    height: Math.max(height, 480),
+    borderRadius: EXPANDED_SIZE.radius,
+  };
+}
+
+function getModalLayout(isMaximized: boolean, viewportWidth: number, viewportHeight: number): ModalLayout {
+  return isMaximized
+    ? getExpandedLayout(viewportWidth, viewportHeight)
+    : getWidgetLayout(viewportWidth, viewportHeight);
+}
+
+function useViewportSize() {
+  const [size, setSize] = useState(() =>
+    typeof window !== "undefined"
+      ? { width: window.innerWidth, height: window.innerHeight }
+      : { width: 1440, height: 900 }
+  );
+
+  useEffect(() => {
+    const update = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return size;
+}
 
 export function AIAssistantModal({
   isOpen,
-  isMinimized,
+  isMaximized,
   intent = "conversation",
   onClose,
-  onMinimize,
-  onRestore,
+  onToggleMaximize,
 }: AIAssistantModalProps) {
   const {
     messages,
@@ -121,41 +187,62 @@ export function AIAssistantModal({
     clickSuggestion({ id: `sv-${value}`, label, value });
   };
 
-  if (isMinimized) {
-    return (
-      <button
-        onClick={onRestore}
-        className="fixed right-6 bottom-24 z-50 flex items-center gap-2 rounded-full bg-white py-2 pl-2 pr-4 text-sm text-gray-700 shadow-lg"
-      >
-        <AIAvatar size="sm" showOnline />
-        Continue chat
-      </button>
-    );
-  }
+  const viewport = useViewportSize();
+  const widgetLayout = useMemo(
+    () => getWidgetLayout(viewport.width, viewport.height),
+    [viewport.width, viewport.height]
+  );
+  const modalLayout = useMemo(
+    () => getModalLayout(isMaximized, viewport.width, viewport.height),
+    [isMaximized, viewport.width, viewport.height]
+  );
+  const wasMaximizedRef = useRef(isMaximized);
+  const isLayoutAnimating = wasMaximizedRef.current !== isMaximized;
+  wasMaximizedRef.current = isMaximized;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Light overlay — page stays visible & interactive */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isMaximized ? 0.22 : 0.06 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            className="pointer-events-none fixed inset-0 z-40 bg-black/[0.06]"
+            transition={SIZE_TRANSITION}
+            className="pointer-events-none fixed inset-0 z-40 bg-black"
           />
 
           <motion.div
-            {...WIDGET_ANIMATION}
-            className="fixed right-6 bottom-[80px] z-50 flex h-[620px] w-[420px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            key="assistant-panel"
+            initial={{
+              opacity: 0,
+              scale: 0.96,
+              ...widgetLayout,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              ...modalLayout,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.96,
+            }}
+            transition={isLayoutAnimating ? SIZE_TRANSITION : OPEN_TRANSITION}
+            style={{ position: "fixed", zIndex: 50 }}
+            className={`flex flex-col overflow-hidden bg-white ${
+              isMaximized
+                ? "shadow-[0_24px_80px_rgba(0,0,0,0.18)]"
+                : "shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            }`}
           >
             <AssistantHeader
               onVoiceCall={() => {
                 setVoiceMode(true);
                 startRecording();
               }}
-              onMinimize={onMinimize}
+              isMaximized={isMaximized}
+              onToggleMaximize={onToggleMaximize}
               onClose={onClose}
             />
 

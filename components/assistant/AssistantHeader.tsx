@@ -4,11 +4,17 @@ import { AIAvatar } from "@/components/chat/AIAvatar";
 
 interface AssistantHeaderProps {
   onVoiceCall: () => void;
-  onMinimize: () => void;
+  isMaximized: boolean;
+  onToggleMaximize: () => void;
   onClose: () => void;
 }
 
-export function AssistantHeader({ onVoiceCall, onMinimize, onClose }: AssistantHeaderProps) {
+export function AssistantHeader({
+  onVoiceCall,
+  isMaximized,
+  onToggleMaximize,
+  onClose,
+}: AssistantHeaderProps) {
   return (
     <header className="flex shrink-0 items-center justify-between border-b border-gray-100/80 px-4 py-3">
       <div className="flex min-w-0 items-center gap-2.5">
@@ -32,8 +38,11 @@ export function AssistantHeader({ onVoiceCall, onMinimize, onClose }: AssistantH
         <IconButton onClick={onVoiceCall} label="Voice Call">
           <MicIcon />
         </IconButton>
-        <IconButton onClick={onMinimize} label="Minimize">
-          <MinimizeIcon />
+        <IconButton
+          onClick={onToggleMaximize}
+          label={isMaximized ? "Restore chat size" : "Maximize chat"}
+        >
+          {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
         </IconButton>
         <IconButton onClick={onClose} label="Close">
           <CloseIcon />
@@ -73,7 +82,18 @@ function MicIcon() {
   );
 }
 
-function MinimizeIcon() {
+function MaximizeIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+      <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+      <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+      <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+    </svg>
+  );
+}
+
+function RestoreIcon() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
       <path d="M4 14h6v6" />

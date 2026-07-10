@@ -6,14 +6,14 @@ import { FloatingAIButton } from "@/components/chat/FloatingAIButton";
 import { AIAssistantModal } from "@/components/assistant/AIAssistantModal";
 
 export function HomePage() {
-  const { isOpen, isMinimized, intent, open, close, minimize, restore } = useDrawer();
+  const { isOpen, isMaximized, intent, open, close, toggleMaximize } = useDrawer();
 
   useEffect(() => {
     open("conversation");
   }, [open]);
 
   const handleToggleChat = () => {
-    if (isOpen && !isMinimized) {
+    if (isOpen) {
       close();
     } else {
       open("conversation");
@@ -22,18 +22,13 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-800">
-      <FloatingAIButton
-        onClick={handleToggleChat}
-        visible={!isMinimized}
-        active={isOpen && !isMinimized}
-      />
+      <FloatingAIButton onClick={handleToggleChat} visible active={isOpen} />
       <AIAssistantModal
         isOpen={isOpen}
-        isMinimized={isMinimized}
+        isMaximized={isMaximized}
         intent={intent}
         onClose={close}
-        onMinimize={minimize}
-        onRestore={restore}
+        onToggleMaximize={toggleMaximize}
       />
     </div>
   );
